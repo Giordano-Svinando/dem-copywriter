@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍷 Wine Copy Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --burgundy: #6B1A2A;
+    --deep-red: #8B2535;
+    --gold: #C9A96E;
+    --gold-light: #E8D5A3;
+    --cream: #FAF6F0;
+    --dark: #1A0A0E;
+    --mid: #4A2030;
+    --text: #2D1520;
+    --border: rgba(201,169,110,0.25);
+    --glass: rgba(255,255,255,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--cream);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(107,26,42,0.4) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(139,37,53,0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 90%, rgba(201,169,110,0.08) 0%, transparent 40%);
+  }
+
+  header {
+    text-align: center;
+    padding: 3rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(201,169,110,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    color: var(--gold);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .logo span { color: var(--cream); font-style: italic; }
+
+  .tagline {
+    font-size: 0.85rem;
+    color: var(--gold-light);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+  }
+
+  .panel {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
+  }
+
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  input, textarea, select {
+    background: rgba(26,10,14,0.6);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
+  }
+
+  textarea { resize: vertical; min-height: 90px; }
+
+  select option { background: #2D1520; }
+
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+  }
+
+  .lang-btn {
+    background: rgba(26,10,14,0.6);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--cream);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.6rem 0.3rem;
+    text-align: center;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .lang-btn .flag { font-size: 1.3rem; }
+
+  .lang-btn:hover {
+    border-color: var(--gold);
+    background: rgba(201,169,110,0.1);
+  }
+
+  .lang-btn.active {
+    border-color: var(--gold);
+    background: rgba(201,169,110,0.18);
+    color: var(--gold);
+  }
+
+  .generate-btn {
+    background: linear-gradient(135deg, var(--burgundy) 0%, var(--deep-red) 100%);
+    border: 1px solid rgba(201,169,110,0.4);
+    border-radius: 10px;
+    color: var(--gold-light);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 1rem 2.5rem;
+    width: 100%;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .generate-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(201,169,110,0.15));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .generate-btn:hover::before { opacity: 1; }
+  .generate-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(107,26,42,0.5); }
+  .generate-btn:active { transform: translateY(0); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .results { display: none; }
+  .results.visible { display: block; }
+
+  .results-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .result-section {
+    background: rgba(26,10,14,0.5);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .result-section-title {
+    background: rgba(107,26,42,0.3);
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-items {
+    padding: 0.8rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .result-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .result-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(201,169,110,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    padding-top: 0.15rem;
+    min-width: 130px;
+  }
+
+  .result-value {
+    font-size: 0.93rem;
+    line-height: 1.5;
+    color: var(--cream);
+    flex: 1;
+    word-break: break-word;
+  }
+
+  .result-value .char-count {
+    font-size: 0.72rem;
+    color: rgba(201,169,110,0.5);
+    margin-left: 0.5rem;
+  }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--gold);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    opacity: 0;
+    transition: all 0.2s;
+    white-space: nowrap;
+    margin-left: auto;
+  }
+
+  .result-item:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { background: rgba(201,169,110,0.15); }
+  .copy-btn.copied { color: #7EC8A0; border-color: #7EC8A0; }
+
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 3rem;
+    color: var(--gold-light);
+  }
+
+  .loading.visible { display: block; }
+
+  .wine-glass-anim {
+    font-size: 2.5rem;
+    animation: sway 1.5s ease-in-out infinite;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(8deg); }
+  }
+
+  .error-msg {
+    display: none;
+    background: rgba(180,30,30,0.15);
+    border: 1px solid rgba(180,30,30,0.3);
+    border-radius: 8px;
+    color: #FF9090;
+    font-size: 0.88rem;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .error-msg.visible { display: block; }
+
+  .api-key-note {
+    font-size: 0.78rem;
+    color: rgba(201,169,110,0.5);
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .lang-grid { grid-template-columns: repeat(3, 1fr); }
+    .logo { font-size: 2rem; }
+    .result-label { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Wine <span>Copy</span> Generator</div>
+  <div class="tagline">Email & Landing Page · Powered by AI</div>
+</header>
+
+<div class="container">
+
+  <!-- API Key -->
+  <div class="panel">
+    <div class="panel-title">🔑 API Key</div>
+    <div class="form-group">
+      <label>Anthropic API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-api03-..." autocomplete="off">
+    </div>
+    <div class="api-key-note">La chiave non viene salvata. Inseriscila ogni volta che usi il tool.</div>
+  </div>
+
+  <!-- Language -->
+  <div class="panel">
+    <div class="panel-title">🌍 Lingua</div>
+    <div class="lang-grid">
+      <button class="lang-btn active" data-lang="it" onclick="selectLang(this)"><span class="flag">🇮🇹</span>Italiano</button>
+      <button class="lang-btn" data-lang="en" onclick="selectLang(this)"><span class="flag">🇬🇧</span>English</button>
+      <button class="lang-btn" data-lang="de" onclick="selectLang(this)"><span class="flag">🇩🇪</span>Deutsch</button>
+      <button class="lang-btn" data-lang="fr" onclick="selectLang(this)"><span class="flag">🇫🇷</span>Français</button>
+      <button class="lang-btn" data-lang="nl" onclick="selectLang(this)"><span class="flag">🇳🇱</span>Nederlands</button>
+      <button class="lang-btn" data-lang="nl-be" onclick="selectLang(this)"><span class="flag">🇧🇪</span>Vlaams</button>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="panel">
+    <div class="panel-title">✍️ Input</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Topic Creativo</label>
+        <textarea id="creativeTopic" placeholder="Es: L'estate che arriva — il sole, il mare, una bottiglia fresca in mano..." rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Offerta Commerciale</label>
+        <textarea id="commercialOffer" placeholder="Es: 3 bottiglie di Vermentino di Sardegna a 29,90€ (sconto 30%) — spedizione gratis" rows="4"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="generate-btn" id="generateBtn" onclick="generate()">
+    🍷 Genera i testi
+  </button>
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="wine-glass-anim">🍷</div>
+    <div>Sto versando le parole migliori...</div>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results">
+    <hr class="divider">
+    <div class="panel-title" style="margin-bottom:1rem;">📋 Testi generati</div>
+    <div class="results-grid" id="resultsGrid"></div>
+  </div>
+
+</div>
+
+<script>
+let selectedLang = 'it';
+
+function selectLang(btn) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedLang = btn.dataset.lang;
+}
+
+const langNames = {
+  'it': 'italiano',
+  'en': 'British English',
+  'de': 'tedesco (Germania)',
+  'fr': 'francese (Francia)',
+  'nl': 'olandese (Paesi Bassi)',
+  'nl-be': 'fiammingo belga (Belgio)'
+};
+
+const fieldLabels = {
+  oggetto: 'Oggetto',
+  oggettoAlternativo: 'Oggetto alternativo',
+  preview: 'Preview',
+  previewAlternativa: 'Preview alternativa',
+  bodyEmail: 'Body email',
+  cta: 'CTA',
+  ctaAlternativa: 'CTA alternativa',
+  titoloLanding: 'Titolo landing',
+  bodyLanding: 'Body landing'
+};
+
+const sectionGroups = {
+  'EMAIL': ['oggetto','oggettoAlternativo','preview','previewAlternativa','bodyEmail','cta','ctaAlternativa'],
+  'LANDING PAGE': ['titoloLanding','bodyLanding']
+};
+
+const charLimits = {
+  oggetto: 64, oggettoAlternativo: 64, preview: 64, previewAlternativa: 64,
+  bodyEmail: 300, titoloLanding: 64, bodyLanding: 120
+};
+
+async function generate() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const topic = document.getElementById('creativeTopic').value.trim();
+  const offer = document.getElementById('commercialOffer').value.trim();
+  const errEl = document.getElementById('errorMsg');
+
+  errEl.classList.remove('visible');
+
+  if (!apiKey) { showError('Inserisci la tua API key Anthropic.'); return; }
+  if (!topic) { showError('Inserisci un topic creativo.'); return; }
+  if (!offer) { showError("Inserisci l'offerta commerciale."); return; }
+
+  setLoading(true);
+
+  const lang = langNames[selectedLang];
+
+  const prompt = `Sei il copywriter di un ecommerce di vino italiano. Devi generare testi per email marketing e landing page in ${lang}.
+
+BUYER PERSONA: uomo, circa 40 anni, licenzea superiore, vive in città, appassionato di vino ma non esperto, attento al prezzo e alle offerte, vive la vita con passione e buon senso.
+
+TONO DI VOCE: pushy, diretto, amichevole, familiare, rassicurante. Parla come un amico che ti fa trovare l'affare giusto.
+
+TOPIC CREATIVO: ${topic}
+
+OFFERTA COMMERCIALE: ${offer}
+
+Genera esattamente i seguenti campi in ${lang}, rispettando i limiti di caratteri indicati. Rispondi SOLO con un oggetto JSON valido, senza markdown, senza backtick, senza testo aggiuntivo:
+
+{
+  "oggetto": "max 64 caratteri — contiene l'offerta commerciale E un riferimento al topic creativo",
+  "oggettoAlternativo": "max 64 caratteri — usabile come reminder dell'oggetto principale",
+  "preview": "max 64 caratteri — riferimento al topic creativo",
+  "previewAlternativa": "max 64 caratteri — riferimento all'offerta commerciale",
+  "bodyEmail": "max 300 caratteri — sviluppo del topic creativo, coinvolgente e pushy",
+  "cta": "testo del pulsante CTA principale (es: 'Approfitta subito')",
+  "ctaAlternativa": "testo del pulsante CTA alternativa",
+  "titoloLanding": "max 64 caratteri — riferimento al topic creativo",
+  "bodyLanding": "max 120 caratteri — versione compressa della body email"
+}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error?.message || `Errore API: ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const raw = data.content[0].text.trim();
+    
+    // Try to extract JSON
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Risposta non valida dal modello.');
+    
+    const result = JSON.parse(jsonMatch[0]);
+    renderResults(result);
+  } catch(e) {
+    showError(e.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function renderResults(data) {
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = '';
+
+  for (const [sectionName, fields] of Object.entries(sectionGroups)) {
+    const section = document.createElement('div');
+    section.className = 'result-section';
+    
+    let html = `<div class="result-section-title">${sectionName}</div><div class="result-items">`;
+    
+    for (const key of fields) {
+      const value = data[key] || '—';
+      const limit = charLimits[key];
+      const count = value.length;
+      const over = limit && count > limit;
+      const countHtml = limit ? `<span class="char-count" style="${over ? 'color:#FF9090' : ''}">${count}/${limit}</span>` : '';
+      
+      html += `
+        <div class="result-item">
+          <div class="result-label">${fieldLabels[key] || key}</div>
+          <div class="result-value">${escHtml(value)}${countHtml}</div>
+          <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(value)})">Copia</button>
+        </div>`;
+    }
+    
+    html += '</div>';
+    section.innerHTML = html;
+    grid.appendChild(section);
+  }
+
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function copyText(btn, text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = '✓ Copiato';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copia'; btn.classList.remove('copied'); }, 1500);
+  } catch(e) {}
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('visible');
+}
+
+function setLoading(on) {
+  document.getElementById('generateBtn').disabled = on;
+  document.getElementById('loading').classList.toggle('visible', on);
+  if (on) {
+    document.getElementById('results').classList.remove('visible');
+    document.getElementById('errorMsg').classList.remove('visible');
+  }
+}
+
+// Allow Enter in inputs (but not textarea) to trigger generation
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    generate();
+  }
+});
+</script>
+</body>
+</html>
